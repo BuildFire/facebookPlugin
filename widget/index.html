@@ -47,19 +47,25 @@
         if (result && result.data && !angular.equals({}, result.data)) {
             if (result.data.content) {
                 content = result.data.content;
-                buildfire.spinner.hide();
-                buildfire.getContext(function (err, context) {
-                    if (context.device.platform != "web") {
-                        buildfire.navigation.openWindow(content.facebookId, "_blank");
-                        buildfire.navigation.goBack();
-                    } else {
-                        document.querySelector(".link-verified").style.display = "block";
-                    }
-                });
+            } else if(!result.id && !result.data.content) {
+                content = {
+                    facebookId: "https://www.facebook.com/zuck"
+                }
             }
         } else {
-            buildfire.spinner.hide();
+            content = {
+                facebookId: "https://www.facebook.com/zuck"
+            };
         }
+        buildfire.spinner.hide();
+        buildfire.getContext(function (err, context) {
+            if (context.device.platform != "web") {
+                buildfire.navigation.openWindow(content.facebookId, "_blank");
+                buildfire.navigation.goBack();
+            } else {
+                document.querySelector(".link-verified").style.display = "block";
+            }
+        });
     }
     /*
      * Go pull saved data
