@@ -49,6 +49,13 @@
             buildfire.datastore.get(function (err, result) {
                 if (!err) {
                     $scope.datastoreInitialized = true;
+                    if (result && !result.id) {
+                        $scope.data = {
+                            content : {
+                                facebookId: "https://www.facebook.com/zuck"
+                            }
+                        };
+                    }
                 } else {
                     console.error("Error: ", err);
                     return;
@@ -57,14 +64,7 @@
                 if (result && result.data && !angular.equals({}, result.data)) {
                     $scope.data = result.data;
                     $scope.id = result.id;
-                } else {
-                    $scope.data = {
-                        content: {
-                            facebookId: ""
-                        }
-                    };
                 }
-
                 /*
                  * watch for changes in data and trigger the saveDataWithDelay function on change
                  * */
