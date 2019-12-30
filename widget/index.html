@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head lang="en">
     <meta charset="UTF-8">
     <title>widget</title>
@@ -14,10 +15,12 @@
         }
 
         /* 1 */
-        div.link-verified > div {
+        div.link-verified>div {
             margin: 0;
-            position: absolute; /* 2 */
-            top: 50%; /* 3 */
+            position: absolute;
+            /* 2 */
+            top: 50%;
+            /* 3 */
             transform: translate(0, -50%);
             width: 100%;
         }
@@ -30,74 +33,84 @@
         }
     </style>
 </head>
-<body>
-<div class="text-center link-verified">
-    <div class="col-md-12">
-        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-        <p>
-            We were able to verify the link you provided. The link will only appear on your mobile device.
-        </p>
-    </div>
-</div>
-<script>
-    buildfire.spinner.show();
 
-    function dataLoadedHandler(result) {
-        var content = null;
-        if (result && result.data && !angular.equals({}, result.data)) {
-            if (result.data.content) {
-                content = result.data.content;
-            } else if(!result.id && !result.data.content) {
+<body>
+    <div class="text-center link-verified">
+        <div class="col-md-12">
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+            <p>
+                We were able to verify the link you provided. The link will only appear on your mobile device.
+            </p>
+        </div>
+    </div>
+    <script>
+        buildfire.spinner.show();
+
+        function dataLoadedHandler(result) {
+            var content = null;
+            if (result && result.data && !angular.equals({}, result.data)) {
+                if (result.data.content) {
+                    content = result.data.content;
+                } else if (!result.id && !result.data.content) {
+                    content = {
+                        facebookId: "https://www.facebook.com/zuck"
+                    }
+                }
+            } else {
                 content = {
                     facebookId: "https://www.facebook.com/zuck"
+                };
+            }
+            buildfire.spinner.hide();
+            buildfire.getContext(function (err, context) {
+                if (context.device.platform != "web") {
+                    buildfire.navigation.openWindow(content.facebookId, "_blank");
+                    setTimeout(function () {
+                        buildfire.navigation.goBack();
+                    }, 200);
+                } else {
+                    if (buildfire.context.liveMode == "0")//CP
+                        document.querySelector(".link-verified").style.display = "block";
+                    else {
+                        //HTML5 Version
+                        // window.open(content.facebookId, "_blank");
+                        var fb = {
+                            action: "linkToWeb",
+                            openIn: "_system",
+                            title: "url",
+                            url: content.facebookId
+                        };
+                        buildfire.actionItems.execute(fb, function (err, res) { });
+                    }
                 }
-            }
-        } else {
-            content = {
-                facebookId: "https://www.facebook.com/zuck"
-            };
+            });
         }
-        buildfire.spinner.hide();
-        buildfire.getContext(function (err, context) {
-            if (context.device.platform != "web" ) {
-                buildfire.navigation.openWindow(content.facebookId, "_blank");
-                setTimeout(function () {
-                    buildfire.navigation.goBack();
-                },200);
-            } else {
-                if( buildfire.context.liveMode=="0")//CP
-                    document.querySelector(".link-verified").style.display = "block";
-                else//HTML5 Version
-                    window.open(content.facebookId, "_blank");
-            }
+        /*
+         * Go pull saved data
+         * */
+        var loadData = function () {
+            buildfire.datastore.get(function (err, result) {
+                if (err) {
+                    console.error("Error: ", err);
+                    buildfire.spinner.hide();
+
+                } else {
+                    dataLoadedHandler(result);
+                }
+            });
+        }
+
+        loadData();
+
+        /**
+         * when a refresh is triggered get reload data
+         */
+        buildfire.datastore.onRefresh(loadData);
+
+        buildfire.datastore.onUpdate(function (result) {
+            dataLoadedHandler(result);
         });
-    }
-    /*
-     * Go pull saved data
-     * */
-    var loadData = function () {
-        buildfire.datastore.get(function (err, result) {
-            if (err) {
-                console.error("Error: ", err);
-                buildfire.spinner.hide();
-
-            } else {
-                dataLoadedHandler(result);
-            }
-        });
-    }
-
-    loadData();
-
-    /**
-     * when a refresh is triggered get reload data
-     */
-    buildfire.datastore.onRefresh(loadData);
-
-    buildfire.datastore.onUpdate(function (result) {
-        dataLoadedHandler(result);
-    });
-</script>
+    </script>
 </body>
 
 </html>
