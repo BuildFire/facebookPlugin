@@ -60,7 +60,7 @@
         buildfire.spinner.hide();
         buildfire.getContext(function (err, context) {
             if (context.device.platform != "web" ) {
-                buildfire.navigation.openWindow(content.facebookId, "_blank");
+                buildfire.navigation.openWindow(content.facebookId, "_system");
                 setTimeout(function () {
                     buildfire.navigation.goBack();
                 },200);
