@@ -65,6 +65,24 @@
     }
 
     function initFacebookPlugin(facebookURL) {
+        const facebookURLType = getFacebookURLType(facebookURL);
+        if (facebookURLType === 'video') {
+            facebookPlugin.className = "fb-video";
+            facebookPlugin.setAttribute("data-show-text", "true");
+        } else if (facebookURLType === 'post') {
+            facebookPlugin.className = "fb-post";
+            facebookPlugin.setAttribute("data-show-text", "true");
+        } else if (facebookURLType === 'group') {
+            facebookPlugin.className = "fb-group";
+            facebookPlugin.setAttribute("data-tabs", "timeline");
+            facebookPlugin.setAttribute("data-show-metadata", "true");
+        } else if (facebookURLType === 'page'){
+            facebookPlugin.className = "fb-page";
+            facebookPlugin.setAttribute("data-tabs", "timeline");
+        } else {
+            return; // Invalid URL
+        }
+
         const dataContainer = document.querySelector(".link-verified");
         const body = document.body;
 
@@ -82,23 +100,6 @@
         facebookPlugin.setAttribute("data-width", body.clientWidth);
         facebookPlugin.setAttribute("data-height", body.clientHeight);
         facebookPlugin.id = "fb-main-container";
-
-        const facebookURLType = getFacebookURLType(facebookURL);
-
-        if (facebookURLType === 'video') {
-            facebookPlugin.className = "fb-video";
-            facebookPlugin.setAttribute("data-show-text", "true");
-        } else if (facebookURLType === 'post') {
-            facebookPlugin.className = "fb-post";
-            facebookPlugin.setAttribute("data-show-text", "true");
-        } else if (facebookURLType === 'group') {
-            facebookPlugin.className = "fb-group";
-            facebookPlugin.setAttribute("data-tabs", "timeline");
-            facebookPlugin.setAttribute("data-show-metadata", "true");
-        } else if (facebookURLType === 'page'){
-            facebookPlugin.className = "fb-page";
-            facebookPlugin.setAttribute("data-tabs", "timeline");
-        }
 
         document.body.appendChild(facebookSDKScript);
         document.body.appendChild(facebookPlugin);
