@@ -12,7 +12,7 @@
             position: relative;
             display: none;
         }
-
+        
         /* 1 */
         div.link-verified > div {
             margin: 0;
@@ -21,7 +21,7 @@
             transform: translate(0, -50%);
             width: 100%;
         }
-
+        
         div.link-verified .glyphicon {
             border: 2px solid;
             padding: 10px;
@@ -41,13 +41,13 @@
 </div>
 <script>
     buildfire.spinner.show();
-
+    
     function dataLoadedHandler(result) {
         var content = null;
         if (result && result.data && !angular.equals({}, result.data)) {
             if (result.data.content) {
                 content = result.data.content;
-            } else if(!result.id && !result.data.content) {
+            } else if (!result.id && !result.data.content) {
                 content = {
                     facebookId: "https://www.facebook.com/zuck"
                 }
@@ -59,19 +59,29 @@
         }
         buildfire.spinner.hide();
         buildfire.getContext(function (err, context) {
-            if (context.device.platform != "web" ) {
-                buildfire.navigation.openWindow(content.facebookId, "_blank");
+            if (err) {
+                console.error(err);
+                return;
+            }
+            
+            const isWebPlatform = context.device.platform === "web";
+            const isControlPanel = buildfire.context.liveMode === 0;
+            
+            if (isWebPlatform) {
+                if (isControlPanel) {
+                    document.querySelector(".link-verified").style.display = "block";
+                } else {
+                    buildfire.navigation.openWindow(content.facebookId, "_system");
+                }
+            } else {
+                buildfire.navigation.openWindow(content.facebookId, "_system");
                 setTimeout(function () {
                     buildfire.navigation.goBack();
-                },200);
-            } else {
-                if( buildfire.context.liveMode=="0")//CP
-                    document.querySelector(".link-verified").style.display = "block";
-                else//HTML5 Version
-                    buildfire.navigation.openWindow(content.facebookId, "_system");
+                }, 200);
             }
         });
     }
+    
     /*
      * Go pull saved data
      * */
@@ -80,20 +90,20 @@
             if (err) {
                 console.error("Error: ", err);
                 buildfire.spinner.hide();
-
+                
             } else {
                 dataLoadedHandler(result);
             }
         });
     }
-
+    
     loadData();
-
+    
     /**
      * when a refresh is triggered get reload data
      */
     buildfire.datastore.onRefresh(loadData);
-
+    
     buildfire.datastore.onUpdate(function (result) {
         dataLoadedHandler(result);
     });
